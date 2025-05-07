@@ -1,0 +1,110 @@
+import time
+
+przejscia1 = 0
+ruchy_rekurencyjne = []
+ruchy_iteracyjne = []
+
+
+def hanoi_rekurencyjny(n, source, destination, buffer, slupki):
+    global przejscia1
+    if n == 1:
+        krazek = slupki[source].pop()
+        slupki[destination].append(krazek)
+        przejscia1 += 1
+        ruchy_rekurencyjne.append((krazek, source, destination))
+        #print(f'{krazek}: {source} -> {destination}')
+    else:
+        hanoi_rekurencyjny(n - 1, source, buffer, destination, slupki)
+        hanoi_rekurencyjny(1, source, destination, buffer, slupki)
+        hanoi_rekurencyjny(n - 1, buffer, destination, source, slupki)
+
+przejscia2 = 0
+
+def mozliwy(source, destination):
+    global przejscia2
+    przejscia2 += 1
+    if not source:
+        return False
+    if not destination:
+        return True
+    return source[-1] < destination[-1]
+
+
+def ruch(source, destination, source_name, destination_name):
+    if mozliwy(source, destination):
+        krazek = source.pop()
+        destination.append(krazek)
+        # print(f"{krazek}: {source_name} -> {destination_name}")
+        ruchy_iteracyjne.append((krazek, source_name, destination_name))
+    else:
+        krazek = destination.pop()
+        source.append(krazek)
+        # print(f"{krazek}: {destination_name} -> {source_name}")
+        ruchy_iteracyjne.append((krazek, destination_name, source_name))
+
+
+def hanoi_iteracyjny(n, source, destination, buffer):
+    source_name = 'A'
+    destination_name = 'B'
+    buffer_name = 'C'
+
+    if n % 2 == 0:
+        destination_name, buffer_name = buffer_name, destination_name
+        destination, buffer = buffer, destination
+
+    ilosc_ruchow = 2 ** n - 1
+
+    for i in range(1, ilosc_ruchow + 1):
+        if i % 3 == 1:
+            ruch(source, destination, source_name, destination_name)
+        elif i % 3 == 2:
+            ruch(source, buffer, source_name, buffer_name)
+        elif i % 3 == 0:
+            ruch(buffer, destination, buffer_name, destination_name)
+
+
+def main():
+    global przejscia1
+    global przejscia2
+    for n in range(13, 16, 1):
+
+        slupki = {
+            'A': list(reversed(range(1, n + 1))),
+            'B': [],
+            'C': []
+        }
+
+        ruchy_rekurencyjne.clear()
+        ruchy_iteracyjne.clear()
+
+        wzor = 2 ** n - 1
+        stime_rek = time.time()
+        hanoi_rekurencyjny(n, 'A', 'B', 'C', slupki)
+        endtime_rek = time.time() - stime_rek
+
+        source_iteracyjny = [i for i in range(n,0,-1)]
+        destination_iteracyjny = []
+        buffer_iteracyjny = []
+
+        stime_iter = time.time()
+        hanoi_iteracyjny(n, source_iteracyjny, destination_iteracyjny, buffer_iteracyjny)
+        endtime_iter = time.time() - stime_iter
+
+        print('')
+        print(f'Ilosc krokow ze wzoru: {wzor}')
+
+        print(f'Hanoi rekurencyjne kroki: {przejscia1}')
+        przejscia1 = 0
+        print(f'Hanoi iteracyjne kroki: {przejscia2}')
+        przejscia2 = 0
+
+        print(f"Hanoi rekurencyjne czas: {endtime_rek} sekund")
+        print(f"Hanoi iteracyjne czas: {endtime_iter} sekund")
+
+        if ruchy_rekurencyjne == ruchy_iteracyjne:
+            print(f'Oba algorytmy wykonały te same ruchy')
+        else:
+            print(f'Algorytmy wykonały inne ruchy')
+
+
+main()
