@@ -4,7 +4,6 @@ przejscia1 = 0
 ruchy_rekurencyjne = []
 ruchy_iteracyjne = []
 
-
 def hanoi_rekurencyjny(n, source, destination, buffer, slupki):
     global przejscia1
     if n == 1:
@@ -29,7 +28,6 @@ def mozliwy(source, destination):
         return True
     return source[-1] < destination[-1]
 
-
 def ruch(source, destination, source_name, destination_name):
     if mozliwy(source, destination):
         krazek = source.pop()
@@ -41,7 +39,6 @@ def ruch(source, destination, source_name, destination_name):
         source.append(krazek)
         # print(f"{krazek}: {destination_name} -> {source_name}")
         ruchy_iteracyjne.append((krazek, destination_name, source_name))
-
 
 def hanoi_iteracyjny(n, source, destination, buffer):
     source_name = 'A'
@@ -105,6 +102,5 @@ def main():
             print(f'Oba algorytmy wykonały te same ruchy')
         else:
             print(f'Algorytmy wykonały inne ruchy')
-
 
 main()
