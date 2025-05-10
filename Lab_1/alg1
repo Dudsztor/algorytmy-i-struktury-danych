@@ -1,0 +1,82 @@
+import random
+import time
+
+def insertionsort(A):
+    for i in range (1,len(A)):
+        x = A[i]
+        j = i - 1
+        while j >= 0 and A[j] > x:
+            A[j+1] = A[j]
+            j = j - 1
+        A[j+1] = x
+
+def mergesort(A, a, b):
+    if a < b:
+        c = (a+b)//2
+        mergesort(A, a, c)
+        mergesort(A, c+1, b)
+        merge(A, a, c, b)
+
+def merge(A, a, c, b):
+    n1 = c - a + 1
+    n2 = b - c
+
+    left = [0]*n1
+    right = [0]*n2
+
+    i = j = 0
+    k = a
+
+    while i < n1 and j < n2:
+        if left[i] < right[j]:
+            A[k] = left[i]
+            i += 1
+        else:
+            A[k] = right[j]
+            j += 1
+        k += 1
+
+    while i < n1:
+        A[k] = left[i]
+        i += 1
+        k += 1
+
+    while j < n2:
+        A[k] = right[j]
+        j += 1
+        k += 1
+
+iterations = 200
+sequence_lenght = 2000
+draw_lange = 10000
+
+time_insertionsort = []
+time_mergesort = []
+
+for i in range(iterations):
+    data = [random.randint(0,draw_lange) for i in range(sequence_lenght)]
+    data2 = list(data)
+
+    stime_insertionsort = time.time()
+    insertionsort(data)
+    endtime_insertionsort = (time.time()-stime_insertionsort)
+    time_insertionsort.append(endtime_insertionsort)
+
+    stime_mergesort = time.time()
+    mergesort(data2, 0, len(data)-1)
+    endtime_mergesort = (time.time() - stime_mergesort)
+    time_mergesort.append(endtime_mergesort)
+
+
+
+print(f'Czas wykonywania wszystkich iteracji: {round(sum(time_insertionsort),5)} - Insertionsort')
+print(f'Czas wykonywania wszystkich iteracji: {round(sum(time_mergesort),5)} - Mergesort')
+
+print(f'Czas najszybszej iteracji: {round(min(time_insertionsort),5)} - Insertionsort')
+print(f'Czas najszybszej iteracji: {round(min(time_mergesort),5)} - Mergesort')
+
+print(f'Czas najwolniejszej iteracji: {round(max(time_insertionsort),5)} - Insertionsort')
+print(f'Czas najwolniejszej iteracji: {round(max(time_mergesort),5)} - Mergesort')
+
+print(f'Średni czas iteracji: {round((sum(time_insertionsort)/len(time_insertionsort)),5)} - Insertionsort')
+print(f'Średni czas iteracji: {round((sum(time_mergesort)/len(time_mergesort)),5)} - Mergesort')
