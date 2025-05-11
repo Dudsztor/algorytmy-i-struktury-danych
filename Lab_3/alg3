@@ -10,3 +10,14 @@ tree_elements = {
     9.5: [9.3],
 }
 
+def show_tree(root, level):
+    if root in tree_elements:
+        print(f'{root}-{tree_elements[root][0]}')
+        for i in range(len(tree_elements[root])):
+            try:
+                print(f'   -{tree_elements[root][i+1]}')
+                show_tree(tree_elements[root][i+1], 0)
+            except:
+                continue
+
+show_tree(roots_values[3], 0)
