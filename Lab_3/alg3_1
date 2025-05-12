@@ -1,0 +1,48 @@
+class Node:
+    def __init__(self, value):
+        self.value = value
+        self.children = []
+
+def add_child(parent, child):
+    parent.children.append(child)
+
+def print_tree(root, level=0):
+    if root is not None:
+        print(" " * (level * 4) + "-" * level + str(root.value))
+        for child in root.children:
+            print_tree(child, level + 1)
+
+# Lista korzeni (główne węzły)
+roots_values = [1.5, 3.5, 4.5, 7.5, 9.5]
+
+# Słownik z węzłami i ich dziećmi
+tree_elements = {
+    1.5: [1.3, 1.6],
+    3.5: [3.7],
+    4.5: [4.0, 4.99],
+    7.5: [7.3, 7.8],
+    7.8: [7.7, 7.9],
+    7.7: [7.6],
+    9.5: [9.3],
+}
+
+# Tworzymy pusty słownik, w którym będą wszystkie węzły
+nodes = {}
+
+# Najpierw tworzymy wszystkie węzły z wartości w słowniku
+for parent_value in tree_elements:
+    if parent_value not in nodes:
+        nodes[parent_value] = Node(parent_value)
+    for child_value in tree_elements[parent_value]:
+        if child_value not in nodes:
+            nodes[child_value] = Node(child_value)
+        add_child(nodes[parent_value], nodes[child_value])
+
+# Teraz drukujemy każde drzewo, zaczynając od jego korzenia
+for root_value in roots_values:
+    if root_value in nodes:
+        root = nodes[root_value]
+    else:
+        root = Node(root_value)  # jak nie ma dzieci, to też robimy węzeł
+    print_tree(root)
+    print()
