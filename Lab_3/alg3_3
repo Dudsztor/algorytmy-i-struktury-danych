@@ -1,102 +1,120 @@
 import random
 import time
 
+
 class Node:
     def __init__(self, value):
         self.value = value
-        self.children = []
+        self.left = None
+        self.right = None
 
-class Tree:
-    def __init__(self, tree_data):
-        self.tree_data = tree_data
-        self.nodes = {}
-        self.roots = []
+
+class BinarySearchTree:
+    def __init__(self, N):
+        self.N = N
+        self.root = [None] * (N + 1)
 
     def insert(self, x):
-        if x in self.nodes:
-            return
-        node = Node(x)
-        self.nodes[x] = node
-
-        parent = self._find_parent(x)
-        if parent is not None:
-            self.nodes[parent].children.append(node)
+        idx = int(x)
+        if self.root[idx] is None:
+            self.root[idx] = Node(x)
         else:
-            self.roots.append(node)
+            self._insert_recursive(self.root[idx], x)
 
-    def _find_parent(self, x):
-        for parent, children in self.tree_data.items():
-            if x in children:
-                return parent
-        return None
+    def _insert_recursive(self, node, x):
+        if x <= node.value:
+            if node.left is None:
+                node.left = Node(x)
+            else:
+                self._insert_recursive(node.left, x)
+        else:
+            if node.right is None:
+                node.right = Node(x)
+            else:
+                self._insert_recursive(node.right, x)
 
     def search(self, x):
-        return x in self.nodes
+        for node in self.root:
+            if node is not None and self._search_recursive(node, x):
+                return True
+        return False
 
-    def minimum(self, root_val):
-        if root_val not in self.nodes:
-            return None
-        return self._min_recursive(self.nodes[root_val])
+    def _search_recursive(self, node, x):
+        if node is None:
+            return False
+        if node.value == x:
+            return True
+        elif x < node.value:
+            return self._search_recursive(node.left, x)
+        else:
+            return self._search_recursive(node.right, x)
 
-    def _min_recursive(self, node):
-        res = node.value
-        for child in node.children:
-            res = min(res, self._min_recursive(child))
-        return res
+    def minimum(self):
+        min_val = float('inf')
+        for node in self.root:
+            if node is not None:
+                min_val = min(min_val, self._minimum_recursive(node))
+        return min_val
 
-    def maximum(self, root_val):
-        if root_val not in self.nodes:
-            return None
-        return self._max_recursive(self.nodes[root_val])
+    def _minimum_recursive(self, node):
+        if node.left is None:
+            return node.value
+        return self._minimum_recursive(node.left)
 
-    def _max_recursive(self, node):
-        res = node.value
-        for child in node.children:
-            res = max(res, self._max_recursive(child))
-        return res
+    def maximum(self):
+        max_val = float('-inf')
+        for node in self.root:
+            if node is not None:
+                max_val = max(max_val, self._maximum_recursive(node))
+        return max_val
 
-def generate_random_tree_data(n, max_children=3):
-    values = sorted(random.sample(range(1, n * 10), n))
-    tree_data = {}
-    for i in range(n):
-        parent = values[i]
-        num_children = random.randint(0, max_children)
-        children = random.sample(values[i+1:], min(len(values) - i - 1, num_children))
-        tree_data[parent] = children
-    return tree_data
+    def _maximum_recursive(self, node):
+        if node.right is None:
+            return node.value
+        return self._maximum_recursive(node.right)
 
-def benchmark(n):
-    print(f"\n=== Benchmark dla {n} elementów ===")
-    tree_data = generate_random_tree_data(n)
-    tree = Tree(tree_data)
+    def print_structure(self):
+        for node in self.root:
+            if node is not None:
+                print(round(node.value))
+                self._print_recursive(node, 1)
 
-    # Pomiar czasu dla insert
-    t0 = time.perf_counter()
-    for parent, children in tree_data.items():
-        tree.insert(parent)
-        for child in children:
-            tree.insert(child)
-    t1 = time.perf_counter()
-    print(f"Czas insert: {t1 - t0:.9f} s")
+    def _print_recursive(self, node, depth):
+        if node.left is not None:
+            print('  ' * depth + str(round(node.left.value, 2)))
+            self._print_recursive(node.left, depth + 1)
+        if node.right is not None:
+            print('  ' * depth + str(round(node.right.value, 2)))
+            self._print_recursive(node.right, depth + 1)
 
-    # Pomiar czasu dla search
-    sample = random.choice(list(tree.nodes.keys()))
-    t0 = time.perf_counter()
-    tree.search(sample)
-    t1 = time.perf_counter()
-    print(f"Czas search: {t1 - t0:.9f} s")
 
-    # Pomiar czasu dla minimum
-    t0 = time.perf_counter()
-    tree.minimum(sample)
-    t1 = time.perf_counter()
-    print(f"Czas minimum: {t1 - t0:.9f} s")
+N_values = [25, 50, 100, 500, 1000, 2000, 4000, 8000, 16000, 32000, 64000, 128000]
 
-    # Pomiar czasu dla maximum
-    t0 = time.perf_counter()
-    tree.maximum(sample)
-    t1 = time.perf_counter()
-    print(f"Czas maximum: {t1 - t0:.9f} s")
+for N in N_values:
+    bst = BinarySearchTree(N)
+    random_numbers = [random.uniform(0.5, N + 0.5) for _ in range(N)]
 
-for size in [25, 50, 100, 500, 1000, 2000, 4000, 8000, 16000, 32000, 64000, 128000]:
-    benchmark(size)
+    start_time = time.time()
+    for num in random_numbers:
+        bst.insert(num)
+    insert_time = time.time() - start_time
+
+    rand_num = random.choice(random_numbers)
+
+    start_time = time.time()
+    bst.search(rand_num)
+    search_time = time.time() - start_time
+
+    start_time = time.time()
+    bst.minimum()
+    min_time = time.time() - start_time
+
+    start_time = time.time()
+    bst.maximum()
+    max_time = time.time() - start_time
+
+    print("n:", N,
+          "; Insert:", f"{insert_time:.6f}s",
+          "; Minimum:", f"{min_time:.6f}s",
+          "; Maximum:", f"{max_time:.6f}s"
+          "; Search:", f"{search_time:.6f}s",)
