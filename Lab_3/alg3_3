@@ -1,0 +1,102 @@
+import random
+import time
+
+class Node:
+    def __init__(self, value):
+        self.value = value
+        self.children = []
+
+class Tree:
+    def __init__(self, tree_data):
+        self.tree_data = tree_data
+        self.nodes = {}
+        self.roots = []
+
+    def insert(self, x):
+        if x in self.nodes:
+            return
+        node = Node(x)
+        self.nodes[x] = node
+
+        parent = self._find_parent(x)
+        if parent is not None:
+            self.nodes[parent].children.append(node)
+        else:
+            self.roots.append(node)
+
+    def _find_parent(self, x):
+        for parent, children in self.tree_data.items():
+            if x in children:
+                return parent
+        return None
+
+    def search(self, x):
+        return x in self.nodes
+
+    def minimum(self, root_val):
+        if root_val not in self.nodes:
+            return None
+        return self._min_recursive(self.nodes[root_val])
+
+    def _min_recursive(self, node):
+        res = node.value
+        for child in node.children:
+            res = min(res, self._min_recursive(child))
+        return res
+
+    def maximum(self, root_val):
+        if root_val not in self.nodes:
+            return None
+        return self._max_recursive(self.nodes[root_val])
+
+    def _max_recursive(self, node):
+        res = node.value
+        for child in node.children:
+            res = max(res, self._max_recursive(child))
+        return res
+
+def generate_random_tree_data(n, max_children=3):
+    values = sorted(random.sample(range(1, n * 10), n))
+    tree_data = {}
+    for i in range(n):
+        parent = values[i]
+        num_children = random.randint(0, max_children)
+        children = random.sample(values[i+1:], min(len(values) - i - 1, num_children))
+        tree_data[parent] = children
+    return tree_data
+
+def benchmark(n):
+    print(f"\n=== Benchmark dla {n} elementów ===")
+    tree_data = generate_random_tree_data(n)
+    tree = Tree(tree_data)
+
+    # Pomiar czasu dla insert
+    t0 = time.perf_counter()
+    for parent, children in tree_data.items():
+        tree.insert(parent)
+        for child in children:
+            tree.insert(child)
+    t1 = time.perf_counter()
+    print(f"Czas insert: {t1 - t0:.9f} s")
+
+    # Pomiar czasu dla search
+    sample = random.choice(list(tree.nodes.keys()))
+    t0 = time.perf_counter()
+    tree.search(sample)
+    t1 = time.perf_counter()
+    print(f"Czas search: {t1 - t0:.9f} s")
+
+    # Pomiar czasu dla minimum
+    t0 = time.perf_counter()
+    tree.minimum(sample)
+    t1 = time.perf_counter()
+    print(f"Czas minimum: {t1 - t0:.9f} s")
+
+    # Pomiar czasu dla maximum
+    t0 = time.perf_counter()
+    tree.maximum(sample)
+    t1 = time.perf_counter()
+    print(f"Czas maximum: {t1 - t0:.9f} s")
+
+for size in [25, 50, 100, 500, 1000, 2000, 4000, 8000, 16000, 32000, 64000, 128000]:
+    benchmark(size)
