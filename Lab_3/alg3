@@ -1,3 +1,17 @@
+class Node:
+    def __init__(self, value):
+        self.value = value
+        self.children = []
+
+def add_child(parent, child):
+    parent.children.append(child)
+
+def print_tree(root, level=0):
+    if root:
+        print(" " * (level * 4) + '-' * level + str(root.value))
+        for child in root.children:
+            print_tree(child, level + 1)
+
 roots_values = [1.5, 3.5, 4.5, 7.5, 9.5]
 
 tree_elements = {
@@ -10,14 +24,15 @@ tree_elements = {
     9.5: [9.3],
 }
 
-def show_tree(root, level):
-    if root in tree_elements:
-        print(f'{root}-{tree_elements[root][0]}')
-        for i in range(len(tree_elements[root])):
-            try:
-                print(f'   -{tree_elements[root][i+1]}')
-                show_tree(tree_elements[root][i+1], 0)
-            except:
-                continue
+nodes = {}
+for parent_val, children_vals in tree_elements.items():
+    if parent_val not in nodes:
+        nodes[parent_val] = Node(parent_val)
+    for child_val in children_vals:
+        if child_val not in nodes:
+            nodes[child_val] = Node(child_val)
+        add_child(nodes[parent_val], nodes[child_val])
 
-show_tree(roots_values[3], 0)
+for root_val in roots_values:
+    root_node = nodes.get(root_val, Node(root_val))
+    print_tree(root_node)
