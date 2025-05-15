@@ -83,6 +83,6 @@ tree.print_structure()
 
 print("\nInsert 1.4:")
 tree.insert(1.4)
-print("Minimum 7.5:", tree.minimum(7.5))
+print("Minimum 7.5:", tree.minimum(4.5))
 print("Maximum 7.5:", tree.maximum(7.5))
 print("Search 1.4:", tree.search(1.4))
