@@ -114,7 +114,7 @@ for N in N_values:
     max_time = time.time() - start_time
 
     print("n:", N,
-          "; Insert:", f"{insert_time:.6f}s",
-          "; Minimum:", f"{min_time:.6f}s",
-          "; Maximum:", f"{max_time:.6f}s"
-          "; Search:", f"{search_time:.6f}s",)
+          ", Insert:", f"{insert_time:.6f}s",
+          ", Minimum:", f"{min_time:.6f}s",
+          ", Maximum:", f"{max_time:.6f}s"
+          ", Search:", f"{search_time:.6f}s",)
