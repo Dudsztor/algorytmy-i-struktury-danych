@@ -6,8 +6,8 @@ class Node:
 
 class Tree:
     def __init__(self):
-        self.nodes = {}
         self.roots = []
+        self.nodes = {}
 
     def insert(self, x):
         if x in self.nodes:
