@@ -1,0 +1,98 @@
+import math
+import random
+import time
+
+
+def read_coordinates(filename):
+    cities = {}
+    with open(filename, 'r') as file:
+        for line in file:
+            parts = line.split()
+            city_id = int(parts[0])
+            x = float(parts[1])
+            y = float(parts[2])
+            cities[city_id] = (x, y)
+    return cities
+
+
+city_coordinates = read_coordinates('TSP.txt')
+
+
+def euclidean_distance(p1, p2):
+    return math.sqrt((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2)
+
+
+def path_length(cities, path):
+    total_length = 0
+    for i in range(len(path) - 1):
+        city1 = cities[path[i]]
+        city2 = cities[path[i + 1]]
+        total_length += euclidean_distance(city1, city2)
+    total_length += euclidean_distance(cities[path[-1]], cities[path[0]])
+    return total_length
+
+
+start_time1 = time.time()
+example_path = list(city_coordinates.keys())
+length = path_length(city_coordinates, example_path)
+end_time1 = time.time() - start_time1
+print(f'Długość ścieżki (kolejność zgodna z plikiem): {length}')
+print(f'Czas (kolejność zgodna z plikiem): {end_time1}')
+
+
+def greedy_tsp(cities):
+    start_city = list(cities.keys())[0]
+    unvisited = set(cities.keys())
+    unvisited.remove(start_city)
+    path = [start_city]
+    current_city = start_city
+
+    while unvisited:
+        next_city = min(unvisited, key=lambda city: euclidean_distance(cities[current_city], cities[city]))
+        unvisited.remove(next_city)
+        path.append(next_city)
+        current_city = next_city
+
+    return path
+
+
+print()
+start_time2 = time.time()
+greedy_path = greedy_tsp(city_coordinates)
+length = path_length(city_coordinates, greedy_path)
+end_time2 = time.time() - start_time2
+print(f'Długość ścieżki (algorytm zachłanny): {length}')
+print(f'Czas (algorytm zachłanny): {end_time2}')
+
+
+def local_search_tsp(cities, max_iterations=1000):
+    current_path = list(cities.keys())
+    random.shuffle(current_path)
+    current_length = path_length(cities, current_path)
+    best_path = current_path.copy()
+    best_length = current_length
+
+    for _ in range(max_iterations):
+        i, j = random.sample(range(len(current_path)), 2)
+        current_path[i], current_path[j] = current_path[j], current_path[i]
+
+        new_length = path_length(cities, current_path)
+
+        if new_length < current_length:
+            current_length = new_length
+            if current_length < best_length:
+                best_path = current_path.copy()
+                best_length = current_length
+        else:
+            current_path[i], current_path[j] = current_path[j], current_path[i]
+
+    return best_path
+
+
+print()
+start_time3 = time.time()
+local_search_path = local_search_tsp(city_coordinates)
+length = path_length(city_coordinates, local_search_path)
+end_time3 = time.time() - start_time3
+print(f'Długość ścieżki (algorytm przeszukiwania losowego): {length}')
+print(f'Czas (algorytm przeszukiwania losowego): {end_time3}')
