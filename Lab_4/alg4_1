@@ -97,5 +97,3 @@ print("Karp-Rabin:\nWspółrzędne wystąpień:")
 print(results_rk)
 print(f"Czas działania: {endtime2:.6f} s")
 print(f"Liczba wystąpień: {len(results_rk)}\n")
-
-
