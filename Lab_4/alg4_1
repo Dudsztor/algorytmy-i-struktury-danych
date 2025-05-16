@@ -1,0 +1,100 @@
+import time
+
+
+def rabin_karp(text, pattern, d, q):
+    n = len(text)
+    m = len(pattern)
+    h = pow(d, m - 1) % q
+    result = set()
+    for x in range(n - 2):
+        p = 0
+        t = 0
+
+        for i in range(m):
+            p = (d * p + ord(pattern[i])) % q
+            t = (d * t + ord(text[x][i])) % q
+        for y in range(n - m + 1):
+            if p == t:
+                found = True
+                for i in range(m):
+                    if (lines[x][y + i] != pattern[i]):
+                        found = False
+                        break
+                if found:
+                    result.add((x, y))
+            if y < n - m:
+                t = ((t - h * ord(text[x][y])) * d + ord(text[x][y + m])) % q
+    return result
+
+
+def rabin_karp_matcher_vertical(text, pattern, d, q, result):
+    n = len(text)
+    m = len(pattern)
+    h = pow(d, m - 1) % q
+
+    final_result = set()
+
+    for x in range(n - 2):
+        p = 0
+        t = 0
+        for i in range(m):
+            p = (d * p + ord(pattern[i])) % q
+            t = (d * t + ord(text[i][x])) % q
+        for y in range(n - m + 1):
+            if p == t:
+                found = True
+                for i in range(m):
+                    if (lines[y + i][x] != pattern[i]):
+                        found = False
+                        break
+                if found and (y, x) in result:
+                    final_result.add((y + 1, x + 1))
+            if y < n - m:
+                t = ((t - h * ord(text[y][x])) * d + ord(text[y + m][x])) % q
+
+    return final_result
+
+
+def rabin_karp_matcher(array, string):
+    results_horizontal = rabin_karp(array, string, 256, 101)
+    results = rabin_karp_matcher_vertical(array, string, 256, 101, results_horizontal)
+    return results
+
+
+def naive_search(data):
+    final_result = set()
+    counter = 0
+    letters = [list(row) for row in data]
+
+    for i in range(len(data) - 2):
+        for j in range(len(data) - 2):
+            if letters[i][j] == 'A' and letters[i][j + 1] == 'B' and letters[i][j + 2] == 'C':
+                if letters[i + 1][j] == 'B' and letters[i + 2][j] == 'C':
+                    final_result.add((i + 1, j + 1))
+                    counter += 1
+
+    return final_result, counter
+
+
+with open('2000_pattern.txt') as file:
+    lines = [line for line in file]
+    lines2 = [line.strip() for line in file]
+letters = [list(row) for row in lines2]
+
+start_time1 = time.time()
+results = rabin_karp_matcher(lines, "ABC")
+end_time1 = time.time() - start_time1
+print("Wspolrzedne wystapien: ")
+print(results)
+print("Czas programu Rabina-Karpa: " + str(end_time1) + "s")
+print("Liczba pasujacych wzorcow: " + str(len(results)))
+
+print()
+
+start_time2 = time.time()
+result, count = naive_search(lines)
+end_time2 = time.time() - start_time2
+print("Wspolrzedne wystapien: ")
+print(result)
+print("Czas programu naiwnego: " + str(end_time2) + "s")
+print("Liczba pasujacych wzorcow: " + str(count))
