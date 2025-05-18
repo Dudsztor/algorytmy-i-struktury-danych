@@ -1,5 +1,6 @@
 import time
 
+
 def naive_search(data):
     results = set()
     count = 0
@@ -9,10 +10,11 @@ def naive_search(data):
         for j in range(len(data[0]) - 2):
             if (letters[i][j] == 'A' and letters[i][j + 1] == 'B' and letters[i][j + 2] == 'C'):
                 if letters[i + 1][j] == 'B' and letters[i + 2][j] == 'C':
-                    results.add((i + 1, j + 1))
+                    results.add((i, j))
                     count += 1
 
     return results, count
+
 
 def rabin_karp_horizontal(text, pattern, d, q):
     n = len(text)
@@ -27,7 +29,7 @@ def rabin_karp_horizontal(text, pattern, d, q):
         for i in range(m):
             p_hash = (d * p_hash + ord(pattern[i])) % q
             t_hash = (d * t_hash + ord(text[row][i])) % q
-        
+
         for col in range(len(text[row]) - m + 1):
             if p_hash == t_hash:
                 match = True
@@ -37,10 +39,11 @@ def rabin_karp_horizontal(text, pattern, d, q):
                         break
                 if match:
                     results.add((row, col))
-            
+
             if col < len(text[row]) - m:
                 t_hash = ((t_hash - h * ord(text[row][col])) * d + ord(text[row][col + m])) % q
     return results
+
 
 def rabin_karp_vertical(text, pattern, d, q, horizontal_results):
     n = len(text)
@@ -51,11 +54,11 @@ def rabin_karp_vertical(text, pattern, d, q, horizontal_results):
     for col in range(len(text[0])):
         p_hash = 0
         t_hash = 0
-        
+
         for i in range(m):
             p_hash = (d * p_hash + ord(pattern[i])) % q
             t_hash = (d * t_hash + ord(text[i][col])) % q
-        
+
         for row in range(n - m + 1):
             if p_hash == t_hash:
                 match = True
@@ -63,19 +66,21 @@ def rabin_karp_vertical(text, pattern, d, q, horizontal_results):
                     if text[row + i][col] != pattern[i]:
                         match = False
                         break
-                
+
                 if match and (row, col) in horizontal_results:
-                    final_results.add((row + 1, col + 1))
-            
+                    final_results.add((row, col))
+
             if row < n - m:
                 t_hash = ((t_hash - h * ord(text[row][col])) * d + ord(text[row + m][col])) % q
 
     return final_results
 
+
 def rabin_karp_search(array, pattern):
     horizontal_results = rabin_karp_horizontal(array, pattern, 256, 101)
     results = rabin_karp_vertical(array, pattern, 256, 101, horizontal_results)
     return results
+
 
 with open('1000_pattern.txt') as file:
     lines = [line.strip() for line in file]
